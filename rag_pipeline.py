@@ -8,6 +8,7 @@ answering with strict anti-hallucination controls.
 from __future__ import annotations
 
 import logging
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -20,9 +21,19 @@ from vector_store import RETRIEVER_K, VectorStoreManager
 
 logger = logging.getLogger(__name__)
 
+try:
+    HOST_IP = subprocess.check_output(
+        "ip route | awk '/default/ {print $3}'",
+        shell=True,
+    ).decode().strip()
+except Exception:
+    HOST_IP = "127.0.0.1"
+
+OLLAMA_BASE_URL = f"http://{HOST_IP}:11434"
+
 # LLM configuration per project requirements
 OLLAMA_MODEL = "llama3"
-OLLAMA_HOST = "http://localhost:11434"
+OLLAMA_HOST = OLLAMA_BASE_URL
 
 # Minimum relevance threshold for retrieved chunks (cosine similarity proxy)
 MIN_RELEVANCE_SCORE = 0.25
